@@ -1,0 +1,123 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<types:mule xmlns:types="http://www.mulesoft.org/schema/mule/types">
+  <types:catalog>
+    <types:type name="Employee_Details" format="json">
+      <types:shape format="weave" example="examples/Employee.json"><![CDATA[%dw 2.0
+
+type Employee_Details = {|
+  empName: String, 
+  empid: String, 
+  salary: Number {"typeId": "int"}, 
+  empmail: String
+|} {"example": "{\\\"empName\\\":\\\"suresh\\\",\\\"empid\\\":\\\"1234\\\",\\\"salary\\\":5600,\\\"empmail\\\":\\\"abc@gmail.com\\\"}"}
+
+]]></types:shape>
+    </types:type>
+    <types:type name="OutputEmp" format="json">
+      <types:shape format="weave" example="examples/Employee-1.json"><![CDATA[%dw 2.0
+
+type OutputEmp = {|
+  empName: String, 
+  empid: String, 
+  salary: Number {"typeId": "int"}, 
+  empmail: String
+|} {"example": "{\\\"empName\\\":\\\"suresh\\\",\\\"empid\\\":\\\"1234\\\",\\\"salary\\\":5600,\\\"empmail\\\":\\\"abc@gmail.com\\\"}"}
+
+]]></types:shape>
+    </types:type>
+    <types:type name="BookInput" format="xml">
+      <types:example format="xml" element="Book" location="examples/book.xml"/>
+    </types:type>
+    <types:type name="Bookoutput" format="json">
+      <types:shape format="weave" example="examples/Book.json"><![CDATA[%dw 2.0
+
+type Bookoutput = {|
+  item: {|
+    "type": String, 
+    price: Number {"typeId": "int"}, 
+    properties: {|
+      title: String, 
+      author: Array<String>, 
+      year: String, 
+      language: String, 
+      location: String
+    |}
+  |}
+|} {"example": "{\\\"item\\\":{\\\"type\\\":\\\"book\\\",\\\"price\\\":30,\\\"properties\\\":{\\\"title\\\":\\\"Everday italian\\\",\\\"author\\\":[\\\"george\\\"],\\\"year\\\":\\\"2005\\\",\\\"language\\\":\\\"En\\\",\\\"location\\\":\\\"usa\\\"}}}"}
+
+]]></types:shape>
+    </types:type>
+    <types:type name="EmpCSV" format="csv">
+      <types:shape format="weave" example="examples/EmpCSV.csv"><![CDATA[%dw 2.0
+
+type EmpCSV = Array<{|  EmpName: String,   EmpId: String,   EmpSal: String,   EmpEmail: String|}> {"isQuotedString": "false",
+"header": "true",
+"headerLineNumber": "0",
+"separator": ","}
+
+]]></types:shape>
+      <types:properties>
+        <types:property name="headerLineNumber" value="0"/>
+        <types:property name="header" value="true"/>
+        <types:property name="isQuotedString" value="false"/>
+        <types:property name="separator" value=","/>
+      </types:properties>
+    </types:type>
+  </types:catalog>
+  <types:enrichment select="#763d59e8-6767-4436-ba70-be619a98db31">
+    <types:processor-declaration>
+      <types:input-event>
+        <types:message>
+          <types:payload type="Employee_Details"/>
+        </types:message>
+      </types:input-event>
+      <types:output-event>
+        <types:message>
+          <types:payload type="OutputEmp"/>
+        </types:message>
+      </types:output-event>
+    </types:processor-declaration>
+  </types:enrichment>
+  <types:enrichment select="#6948fbe2-4da0-431c-b7fd-92a17171fec1">
+    <types:processor-declaration>
+      <types:input-event>
+        <types:message>
+          <types:payload type="BookInput"/>
+        </types:message>
+      </types:input-event>
+      <types:output-event>
+        <types:message>
+          <types:payload type="Bookoutput"/>
+        </types:message>
+      </types:output-event>
+    </types:processor-declaration>
+  </types:enrichment>
+  <types:enrichment select="#31721ec3-6724-455d-9435-61642ee6b672">
+    <types:processor-declaration>
+      <types:input-event>
+        <types:message>
+          <types:payload type="Bookoutput"/>
+        </types:message>
+      </types:input-event>
+      <types:output-event>
+        <types:message>
+          <types:payload type="BookInput"/>
+        </types:message>
+      </types:output-event>
+    </types:processor-declaration>
+  </types:enrichment>
+  <types:enrichment select="#ac8c5dc6-8388-4345-94bb-7f72c1adcce5">
+    <types:processor-declaration>
+      <types:input-event>
+        <types:message>
+          <types:payload type="Employee_Details"/>
+        </types:message>
+      </types:input-event>
+      <types:output-event>
+        <types:message>
+          <types:payload type="EmpCSV"/>
+        </types:message>
+      </types:output-event>
+    </types:processor-declaration>
+  </types:enrichment>
+</types:mule>

@@ -1,0 +1,241 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<flow name="mule-transformationsFlow" doc:id="3000de87-f161-4abe-9fa6-505d1f4ce45e" >
+		<ee:transform doc:name="Transform JSON to All" doc:id="763d59e8-6767-4436-ba70-be619a98db31" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/csv
+---
+{
+	empName: payload.empName,
+	empid: payload.empid,
+	salary: payload.salary,
+	empmail: payload.empmail
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<ee:transform doc:name="Transform XML to All types" doc:id="6948fbe2-4da0-431c-b7fd-92a17171fec1">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+	item: {
+		price: payload.Book.price,
+		properties: {
+			title: payload.Book.title,
+			author: payload.Book.author,
+			year: payload.Book.year as String,
+			language: payload.Book.title.@language,
+			location: payload.Book.author.@loc
+		}
+	}
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<ee:transform doc:name="Transform Attribute based json to xml" doc:id="31721ec3-6724-455d-9435-61642ee6b672">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/xml
+---
+{
+	Book: {
+		title @(language: payload.item.properties.language): payload.item.properties.title,
+		year: payload.item.properties.year as Number,
+		price: payload.item.price,
+		author @(loc: "USA"): payload.item.properties.author[0]
+	}
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<ee:transform doc:name="Transform JSON to CSV" doc:id="ac8c5dc6-8388-4345-94bb-7f72c1adcce5">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/csv
+---
+[{
+	EmpName: payload.empName,
+	EmpId: payload.empid,
+	EmpSal: payload.salary as String,
+	EmpEmail: payload.empmail
+}]]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<ee:transform doc:name="Transform Datatypes and variables" doc:id="1fcf22ad-1e31-4424-ac7b-ce6573f434f0">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+var emp ={
+ "empid":123,
+ "empname":"suresh",
+ "empstatus":"A"
+}
+---
+{
+	name: "chinna",
+	salary: "234" as Number,
+	empid:emp.empid,
+	empname:emp.empname,
+	empstatus:emp.empstatus
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<ee:transform doc:name="TransformOperators" doc:id="beae80c6-b84a-41df-90fb-3138c4ba2c7b">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+var firstnumber= 20
+var secondnumber = 30
+var firstname= "mule"
+var secondname="ESB"
+var empArray = ["chinna","Ravi","mule"]
+var empObject = {
+ "empid":123,
+ "empname":"suresh",
+ "empstatus":"A"
+}
+var empList = [{
+ "empid":123,
+ "empname":"suresh",
+ "empstatus":"A"
+},{
+ "empid":456,
+ "empname":"madhu",
+ "empstatus":"N"
+}]
+---
+{
+	"++Operator":{
+		fullname: firstname ++ "" ++ secondname,
+		add_newValue_To_array: empArray ++ ['ESB'],
+		add_newField_To_Object: empObject ++ {"salary":4890},
+		add_newObject_To_ObjectList: empList ++ [{
+ "empid":7456,
+ "empname":"chinna",
+ "empstatus":"A"
+}]
+		
+	},
+	"--Operator":{
+		//fullname: firstname ++ "" ++ secondname,
+		remove_Value_From_array: empArray -- ['mule'],
+		remove_Field_From_Object: empObject -- {"empstatus": "A"},
+		remove_Object_From_ObjectList: empList -- [{
+        "empid": 123,
+        "empname": "suresh",
+        "empstatus": "A"
+      }]
+		
+	}
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="mule-transformationsFlow5" doc:id="11ad8a89-c509-4b7c-9115-2e0745eff34d" >
+		<ee:transform doc:name="Transform Message" doc:id="40708c98-68fb-499c-82ca-89b6c7f56f34" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+var country= "India"
+var state = "AP"
+---
+if(country == "USA"){
+	currency: "USD",
+	country: country,
+	state: state
+} else if(country=="India") {
+	currency: "IRS",
+	country: country,
+	state: state
+} else {
+	currency: "None",
+	country: country,
+	state: "None"
+}
+]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<set-payload value='#["company"]' doc:name="Set Payload" doc:id="d6b01c76-d0ce-4cec-98c3-408b7c034110" />
+		<ee:transform doc:name="Transform Message" doc:id="013e35e4-b877-49a4-b858-36b163e0b60a" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+var country = "India"
+var state= null
+
+---
+{
+	country: country,
+	state: if(state != null) state else "",
+	currency: if(country == "USA") "USD" else if(country == "India") "IRS" else "None"
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="mule-transformationsFlow6" doc:id="0326c46f-2e7a-4369-8e7b-81de4dfc7b16" >
+		<ee:transform doc:name="Transform Coercion" doc:id="7c6e92c2-cab3-4277-bada-a7a5b56de414" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/java
+var emp ={
+ "empid":123,
+ "empname":"suresh",
+ "IsActive":true,
+ "Salary":"4689"
+}
+---
+{
+	Name:emp.empname as String default "",
+	ID: emp.empid as Number default "",
+	Status:emp.IsActive as Boolean default false,
+	Sal: emp.Salary as Number default 0
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<set-variable value="#['data']" doc:name="Set Variable" doc:id="c1ba2927-955a-49c8-b659-61c383a5af84" variableName="sample"/>
+		<ee:transform doc:name="Transform Date Time formats" doc:id="07cf60b6-7090-4e26-a844-e0a08feb2ddd">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+	todayDate:now() as Date {format: "yyyy-MM-dd"},
+	todayTime_24_hrs_format: now() as Time {format: "HH:mm:ss.SSS"},
+	todayDate_with_Alphabit_Month:now() as Date {format: "yyyy-MMM-dd"},
+	todayTime_in_12hrs_format:now() as Time {format: "hh:mm:ss"},
+	current_Hour: now() as Time {format: "HH"},
+	current_minutes: now() as Time {format: "mm"},
+	current_seconds:now() as Time {format: "ss"},
+	current_Milliseconds:now() as Time {format: "SSS"},
+	currentDateTime: now() as LocalDateTime {format: "yyyy-MM-dd HH:mm:ss.SSS"},
+	UTCTime: now() >> "UTC",
+	ISTTime: now() >> "IST",
+	ESTTime: now() >> "EST",
+	Convert_UTC_TO_IST: (now() >> "UTC") >> "IST",
+	Timezone_Specific_Timeformat:((now() >> "UTC") >> "IST") as DateTime {format: "yyyy-MM-dd HH:mm:ss"},
+	Los_AngelsTime: now() >> "America/Los_Angeles",
+	London_time: now() >> "Europe/Belfast"	 
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<set-payload value='#[{
+"UTCTime": "2021-02-07T13:36:07.743Z"
+}]' doc:name="Set Payload" doc:id="0abfe429-7663-43cd-a834-25e0b4c1f0c4" />
+		<ee:transform doc:name="Transform Message" doc:id="aa1e9f90-39ed-46a7-a7d8-cd0d655416b6" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+var datetime= "2021-02-07T13:36:07.743Z"
+---
+{
+	timezone: payload.UTCTime as LocalDateTime {format: "yyyy-MM-dd HH:mm:ss"},
+	ESTTime: (payload.UTCTime >> "EST") as LocalDateTime {format: "yyyy-MM-dd HH:mm:ss"}
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+</mule>

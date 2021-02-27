@@ -1,0 +1,14 @@
+{
+	"item": {
+		"type": "book",
+		"price": 30,
+		"properties": {
+			"title": "Everday italian",
+			"author": ["george"],
+			"year": "2005",
+			"language": "En",
+			"location":"usa"
+		}
+	}
+
+}
