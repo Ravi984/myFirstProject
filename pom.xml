@@ -49,7 +49,7 @@
     
     <applicationName>${appname}</applicationName>
 	<businessGroup>${business}</businessGroup>
-	
+	<objectstorev2>true</objectstorev2>
     </cloudHubDeployment>
 	<classifier>mule-application</classifier>
 </configuration>
